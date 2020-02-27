@@ -1,0 +1,19 @@
+{
+  "name": "@vernier/vst-video-utils-build",
+  "version": "1.0.0",
+  "description": "Tarball of binaries used for FFmpeg.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VernierST/vst-video-utils-build.git"
+  },
+  "author": "Vernier Software and Technology",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VernierST/vst-video-utils-build/issues"
+  },
+  "homepage": "https://github.com/VernierST/vst-video-utils-build#readme"
+}
