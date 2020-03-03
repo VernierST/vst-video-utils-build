@@ -2,7 +2,8 @@
   "name": "@vernier/vst-video-utils-build",
   "version": "1.0.0",
   "description": "Tarball of binaries used for FFmpeg.",
-  "main": "index.js",
+  "main": "VideoUtils.js",
+  "module": "VideoUtils.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
