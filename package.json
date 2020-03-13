@@ -13,7 +13,7 @@
     "url": "git+https://github.com/VernierST/vst-video-utils-build.git"
   },
   "author": "Vernier Software and Technology",
-  "license": "ISC",
+  "license": "LGPL-3.0",
   "bugs": {
     "url": "https://github.com/VernierST/vst-video-utils-build/issues"
   },
