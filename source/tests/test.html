@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>VideoUtils - Test</title>
+  </head>
+  <body>
+    <input id="file-input" type="file" accept="video/*"></input>
+    <br>
+    <button onclick="dumpMetaData()">Dump File Info</button>
+    <br>
+    <button onclick="readMetaData()">Read Metadata</button>
+    <br>
+    <button id="run-btn">Transcode File</button>
+    <br>
+    <button id="save-btn">Save File</button>
+
+    <!-- SETUP TEST DATABASE -->
+    <script>
+      const DBNAME = 'mydb';
+      const STORENAME = 'FILE_DATA';
+
+      let db;
+
+      const dbreq = indexedDB.open(DBNAME,22);
+      console.assert(dbreq);
+      dbreq.onerror = (e) => {
+        console.error(e);
+      };
+
+      dbreq.onsuccess = (e) => {
+        console.dir(e);
+        db = dbreq.result;
+        console.dir(db);
+      };
+
+      dbreq.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        db.createObjectStore(STORENAME);
+      };
+
+      document.querySelector('#file-input').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        console.dir(file);
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const buf = reader.result;
+          console.dir(buf);
+
+          console.assert(db);
+          const trans = db.transaction(STORENAME, 'readwrite');
+
+          trans.objectStore(STORENAME).put(new Uint8Array(buf), file.name);
+
+        };
+        reader.readAsArrayBuffer(file);
+      }, false);
+
+    </script>
+
+    <script>
+      const saveBtn = document.querySelector('#save-btn');
+      saveBtn.addEventListener('click', (e) => {
+
+        const filename = 'copy.mov';
+
+        const trans = db.transaction(STORENAME, 'readonly');
+        const req = trans.objectStore(STORENAME).get(filename);
+
+        req.onerror = event => {
+          console.error(event.target.error);
+        };
+
+        req.onsuccess = () => {
+          const arr = req.result;
+          if (arr) {
+            console.dir(arr);
+            const blob = new Blob([arr]);
+            const blobURL = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.download = filename;
+            a.href = blobURL;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+          }
+          else {
+            console.error('Failed to read file');
+          }
+        };
+      }, false);
+
+
+      function dumpMetaData() {
+        const el = document.querySelector('#file-input');
+        let filename = (el && el.value) ? el.value : 'copy.mov';
+        filename = filename.replace(/.*\//,'');
+        filename = filename.replace(/.*\\/,'');
+        console.log(`Dump metadata on file: ${filename}`);
+
+        vidUtils.dumpMetaData(DBNAME, filename).then(meta => {
+        }).catch(e => console.error(e));
+      }
+
+      function readMetaData() {
+        const el = document.querySelector('#file-input');
+        let filename = (el && el.value) ? el.value : 'copy.mov';
+        filename = filename.replace(/.*\//,'');
+        filename = filename.replace(/.*\\/,'');
+        console.log(`Getting metadata on file: ${filename}`);
+
+        vidUtils.readMetaData(DBNAME, filename).then(meta => {
+          console.log('File Metadata');
+          console.dir(meta);
+        }).catch(e => console.error(e));
+      }
+
+    </script>
+
+
+    <script type="module">
+      import { VideoUtils } from './VideoUtils.js'
+
+      const vidUtils = new VideoUtils();
+
+      vidUtils.init().then(() => {
+        console.log('Video Utils Initialized');
+      }).catch((e) => {
+        console.error('Video Utils Initialization Failed');
+        console.dir(e);
+      });
+
+      window.vidUtils = vidUtils;
+
+
+    </script>
+
+  </body>
+</html>
