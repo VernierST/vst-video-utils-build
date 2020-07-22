@@ -18,10 +18,11 @@ class MessageClient {
     });
   }
 
-  callMethod(method, args = []) {
+  callMethod(method, args) {
     console.assert(this.worker);
     console.assert(method);
 
+    args = args || [];
     const id = this._nextId++;
     const msg = { id, method, args };
 
@@ -48,7 +49,7 @@ class MessageClient {
       }
     }
     else {
-      const p = this._pending[msg.id];
+      let p = this._pending[msg.id];
       console.assert(p);
 
       if (p) {
@@ -101,10 +102,26 @@ export class VideoUtils {
 
 
   // returns: Promise<>
-  transmuxFile(db, src, dst) {
-    return this.client.callMethod('transmuxFile', [db,src,dst]);
+  transcodeRotation(db, src, dst) {
+    return this.client.callMethod('transcodeRotation', [db,src,dst]);
   }
 
+  // returns: Promise<>
+  transmuxStripMeta(db, src, dst) {
+    return this.client.callMethod('transmuxStripMeta', [db,src,dst]);
+  }
+
+  createTrackingContext(x, y, radius) {
+    return this.client.callMethod('createTrackingContext', [x,y,radius]);
+  }
+
+  destroyTrackingContext(trackingCtxId) {
+    return this.client.callMethod('destroyTrackingContext', [trackingCtxId]);
+  }
+
+  trackObjectNextFrame(trackingCtxId,timeStamp,width,height,buffer) {
+    return this.client.callMethod('trackObjectNextFrame', [trackingCtxId,timeStamp,width,height,buffer]);
+  }
 
   shutdown() {
     if (this.client) {
